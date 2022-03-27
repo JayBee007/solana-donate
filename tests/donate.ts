@@ -15,7 +15,7 @@ describe("donate", () => {
     await program.rpc.donateProgram(LAMPORTS_TO_DONATE, {
       accounts: {
         sender: donater.publicKey,
-        programAccount: program.provider.wallet.publicKey,
+        programAccount: program.programId,
         systemProgram: anchor.web3.SystemProgram.programId,
       },
       signers: [donater]

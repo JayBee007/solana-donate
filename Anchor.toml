@@ -1,7 +1,7 @@
 [features]
 seeds = false
 [programs.localnet]
-donate = "HH95eqLi8izRFNVob95g4URG62Jkf9HmtXLz5MFXyh7z"
+donate = "52T96EnBuLZpkEzabXggxzU4DLDA44xpTsPvdHfu6ogk"
 
 [registry]
 url = "https://anchor.projectserum.com"
