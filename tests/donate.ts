@@ -1,27 +1,33 @@
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+
 import { Donate } from "../target/types/donate";
 
-describe("donate", () => {
+describe("donate", async () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.Provider.env());
 
   const program = anchor.workspace.Donate as Program<Donate>;
 
-  it("donates lamports to program's account", async () => {
-    const LAMPORTS_TO_DONATE = new anchor.BN(100);
-    const donater = anchor.web3.Keypair.generate();
+  it("creates a PDA account for current wallet holder", async () => {
+    const [userDonationPDA, _] = await PublicKey.findProgramAddress([
+      anchor.utils.bytes.utf8.encode("user-donation"),
+      anchor.getProvider().wallet.publicKey.toBuffer()
+    ], program.programId)
 
-    await program.rpc.donateProgram(LAMPORTS_TO_DONATE, {
-      accounts: {
-        sender: donater.publicKey,
-        programAccount: program.programId,
-        systemProgram: anchor.web3.SystemProgram.programId,
-      },
-      signers: [donater]
-    })
+    console.log("program.programId", program.programId.toBase58())
+    console.log('userDonationPDA', userDonationPDA.toBase58())
 
-    const programAccount = await program.account.programAccount.fetch(program.programId);
-  	console.log(programAccount);
+    await program.rpc.createProgramAddress({
+        accounts:
+          {
+            sender: anchor.getProvider().wallet.publicKey,
+            userDonation: userDonationPDA,
+            systemProgram: SystemProgram.programId
+         },
+  })
+
+    console.log('=>', await program.account.userDonation.fetch(userDonationPDA))
   })
 });
